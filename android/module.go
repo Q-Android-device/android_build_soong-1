@@ -120,10 +120,10 @@ type ModuleContext interface {
 	Glob(globPattern string, excludes []string) Paths
 	GlobFiles(globPattern string, excludes []string) Paths
 
-	InstallExecutable(installPath OutputPath, name string, srcPath Path, deps ...Path) OutputPath
-	InstallFile(installPath OutputPath, name string, srcPath Path, deps ...Path) OutputPath
-	InstallSymlink(installPath OutputPath, name string, srcPath OutputPath) OutputPath
-	InstallAbsoluteSymlink(installPath OutputPath, name string, absPath string) OutputPath
+	InstallExecutable(installPath InstallPath, name string, srcPath Path, deps ...Path) InstallPath
+	InstallFile(installPath InstallPath, name string, srcPath Path, deps ...Path) InstallPath
+	InstallSymlink(installPath InstallPath, name string, srcPath InstallPath) InstallPath
+	InstallAbsoluteSymlink(installPath InstallPath, name string, absPath string) InstallPath
 	CheckbuildFile(srcPath Path)
 
 	AddMissingDependencies(deps []string)
@@ -1304,7 +1304,7 @@ func (m *moduleContext) InstallBypassMake() bool {
 	return m.module.InstallBypassMake()
 }
 
-func (m *moduleContext) skipInstall(fullInstallPath OutputPath) bool {
+func (m *moduleContext) skipInstall(fullInstallPath InstallPath) bool {
 	if m.module.base().commonProperties.SkipInstall {
 		return true
 	}
@@ -1329,18 +1329,18 @@ func (m *moduleContext) skipInstall(fullInstallPath OutputPath) bool {
 	return false
 }
 
-func (a *androidModuleContext) InstallFile(installPath OutputPath, name string, srcPath Path,
-	deps ...Path) OutputPath {
-	return a.installFile(installPath, name, srcPath, Cp, deps)
+func (m *moduleContext) InstallFile(installPath InstallPath, name string, srcPath Path,
+	deps ...Path) InstallPath {
+	return m.installFile(installPath, name, srcPath, Cp, deps)
 }
 
-func (a *androidModuleContext) InstallExecutable(installPath OutputPath, name string, srcPath Path,
-	deps ...Path) OutputPath {
-	return a.installFile(installPath, name, srcPath, CpExecutable, deps)
+func (m *moduleContext) InstallExecutable(installPath InstallPath, name string, srcPath Path,
+	deps ...Path) InstallPath {
+	return m.installFile(installPath, name, srcPath, CpExecutable, deps)
 }
 
-func (a *androidModuleContext) installFile(installPath OutputPath, name string, srcPath Path,
-	rule blueprint.Rule, deps []Path) OutputPath {
+func (m *moduleContext) installFile(installPath InstallPath, name string, srcPath Path,
+	rule blueprint.Rule, deps []Path) InstallPath {
 
 	fullInstallPath := installPath.Join(a, name)
 	a.module.base().hooks.runInstallHooks(a, fullInstallPath, false)
@@ -1375,9 +1375,9 @@ func (a *androidModuleContext) installFile(installPath OutputPath, name string, 
 	return fullInstallPath
 }
 
-func (a *androidModuleContext) InstallSymlink(installPath OutputPath, name string, srcPath OutputPath) OutputPath {
-	fullInstallPath := installPath.Join(a, name)
-	a.module.base().hooks.runInstallHooks(a, fullInstallPath, true)
+func (m *moduleContext) InstallSymlink(installPath InstallPath, name string, srcPath InstallPath) InstallPath {
+	fullInstallPath := installPath.Join(m, name)
+	m.module.base().hooks.runInstallHooks(m, fullInstallPath, true)
 
 	if !a.skipInstall(fullInstallPath) {
 
@@ -1404,9 +1404,9 @@ func (a *androidModuleContext) InstallSymlink(installPath OutputPath, name strin
 
 // installPath/name -> absPath where absPath might be a path that is available only at runtime
 // (e.g. /apex/...)
-func (a *androidModuleContext) InstallAbsoluteSymlink(installPath OutputPath, name string, absPath string) OutputPath {
-	fullInstallPath := installPath.Join(a, name)
-	a.module.base().hooks.runInstallHooks(a, fullInstallPath, true)
+func (m *moduleContext) InstallAbsoluteSymlink(installPath InstallPath, name string, absPath string) InstallPath {
+	fullInstallPath := installPath.Join(m, name)
+	m.module.base().hooks.runInstallHooks(m, fullInstallPath, true)
 
 	if !a.skipInstall(fullInstallPath) {
 		a.Build(pctx, BuildParams{

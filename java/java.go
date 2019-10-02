@@ -1706,7 +1706,7 @@ type Binary struct {
 	isWrapperVariant bool
 
 	wrapperFile android.Path
-	binaryFile  android.OutputPath
+	binaryFile  android.InstallPath
 }
 
 func (j *Binary) HostToolPath() android.OptionalPath {
