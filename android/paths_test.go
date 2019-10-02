@@ -354,6 +354,40 @@ func TestPathForModuleInstall(t *testing.T) {
 			in:  []string{"my_test"},
 			out: "target/product/test_device/recovery/root/my_test",
 		},
+		{
+			name: "root binary",
+			ctx: &moduleInstallPathContextImpl{
+				baseModuleContext: baseModuleContext{
+					target: deviceTarget,
+				},
+				inRoot: true,
+			},
+			in:  []string{"my_test"},
+			out: "target/product/test_device/root/my_test",
+		},
+		{
+			name: "recovery binary",
+			ctx: &moduleInstallPathContextImpl{
+				baseModuleContext: baseModuleContext{
+					target: deviceTarget,
+				},
+				inRecovery: true,
+			},
+			in:  []string{"bin/my_test"},
+			out: "target/product/test_device/recovery/root/system/bin/my_test",
+		},
+		{
+			name: "recovery root binary",
+			ctx: &moduleInstallPathContextImpl{
+				baseModuleContext: baseModuleContext{
+					target: deviceTarget,
+				},
+				inRecovery: true,
+				inRoot:     true,
+			},
+			in:  []string{"my_test"},
+			out: "target/product/test_device/recovery/root/my_test",
+		},
 
 		{
 			name: "system native test binary",
