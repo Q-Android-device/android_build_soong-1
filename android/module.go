@@ -132,7 +132,9 @@ type ModuleContext interface {
 	InstallInTestcases() bool
 	InstallInSanitizerDir() bool
 	InstallInRecovery() bool
-
+	InstallInRoot() bool
+	InstallBypassMake() bool
+	
 	RequiredModuleNames() []string
 
 	// android.ModuleContext methods
@@ -189,6 +191,8 @@ type Module interface {
 	InstallInTestcases() bool
 	InstallInSanitizerDir() bool
 	InstallInRecovery() bool
+	InstallInRoot() bool
+	InstallBypassMake() bool
 	SkipInstall()
 	ExportedToMake() bool
 	NoticeFile() OptionalPath
@@ -668,6 +672,17 @@ func (p *ModuleBase) InstallInSanitizerDir() bool {
 
 func (p *ModuleBase) InstallInRecovery() bool {
 	return Bool(p.commonProperties.Recovery)
+
+func (m *ModuleBase) InstallInRecovery() bool {
+	return Bool(m.commonProperties.Recovery)
+}
+
+func (m *ModuleBase) InstallInRoot() bool {
+	return false
+}
+
+func (m *ModuleBase) InstallBypassMake() bool {
+	return false
 }
 
 func (a *ModuleBase) Owner() string {
@@ -1272,6 +1287,25 @@ func (a *androidModuleContext) InstallInRecovery() bool {
 
 func (a *androidModuleContext) skipInstall(fullInstallPath OutputPath) bool {
 	if a.module.base().commonProperties.SkipInstall {
+
+func (m *moduleContext) InstallInSanitizerDir() bool {
+	return m.module.InstallInSanitizerDir()
+}
+
+func (m *moduleContext) InstallInRecovery() bool {
+	return m.module.InstallInRecovery()
+}
+
+func (m *moduleContext) InstallInRoot() bool {
+	return m.module.InstallInRoot()
+}
+
+func (m *moduleContext) InstallBypassMake() bool {
+	return m.module.InstallBypassMake()
+}
+
+func (m *moduleContext) skipInstall(fullInstallPath OutputPath) bool {
+	if m.module.base().commonProperties.SkipInstall {
 		return true
 	}
 
