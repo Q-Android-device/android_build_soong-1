@@ -239,10 +239,6 @@ func (m moduleInstallPathContextImpl) InstallInRoot() bool {
 	return m.inRoot
 }
 
-func (m moduleInstallPathContextImpl) InstallBypassMake() bool {
-	return false
-}
-
 func TestPathForModuleInstall(t *testing.T) {
 	testConfig := TestConfig("", nil)
 
