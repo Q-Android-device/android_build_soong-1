@@ -50,6 +50,7 @@ type ModuleInstallPathContext interface {
 	InstallInSanitizerDir() bool
 	InstallInRecovery() bool
 	InstallInRoot() bool
+	InstallBypassMake() bool
 }
 
 var _ ModuleInstallPathContext = ModuleContext(nil)
@@ -1215,7 +1216,7 @@ func modulePartition(ctx ModuleInstallPathContext) string {
 	} else if ctx.InstallInTestcases() {
 		partition = "testcases"
 	} else if ctx.InstallInRecovery() {
-			if ctx.InstallInRoot() {
+		if ctx.InstallInRoot() {
 			partition = "recovery/root"
 		} else {
 			// the layout of recovery partion is the same as that of system partition
@@ -1229,7 +1230,9 @@ func modulePartition(ctx ModuleInstallPathContext) string {
 		partition = ctx.DeviceConfig().ProductPath()
 	} else if ctx.ProductServicesSpecific() {
 		partition = ctx.DeviceConfig().ProductServicesPath()
-		} else if ctx.InstallInRoot() {
+	} else if ctx.SystemExtSpecific() {
+		partition = ctx.DeviceConfig().SystemExtPath()
+	} else if ctx.InstallInRoot() {
 		partition = "root"
 	} else {
 		partition = "system"
