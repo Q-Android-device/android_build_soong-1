@@ -22,7 +22,7 @@ import (
 type dexpreopter struct {
 	dexpreoptProperties DexpreoptProperties
 
-	installPath         android.InstallPath
+	installPath         android.OutputPath
 	uncompressedDex     bool
 	isSDKLibrary        bool
 	isTest              bool
@@ -88,7 +88,7 @@ func (d *dexpreopter) dexpreoptDisabled(ctx android.ModuleContext) bool {
 	return false
 }
 
-func odexOnSystemOther(ctx android.ModuleContext, installPath android.InstallPath) bool {
+func odexOnSystemOther(ctx android.ModuleContext, installPath android.OutputPath) bool {
 	return dexpreopt.OdexOnSystemOtherByName(ctx.ModuleName(), android.InstallPathToOnDevicePath(ctx, installPath), dexpreoptGlobalConfig(ctx))
 }
 

@@ -387,8 +387,6 @@ type apexBundle struct {
 	bundleModuleFile android.WritablePath
 	outputFiles      map[apexPackaging]android.WritablePath
 	installDir       android.OutputPath
-	flattenedOutput  android.InstallPath
-	installDir       android.InstallPath
 
 	public_key_file  android.Path
 	private_key_file android.Path
@@ -1292,7 +1290,7 @@ type Prebuilt struct {
 	properties PrebuiltProperties
 
 	inputApex       android.Path
-	installDir      android.InstallPath
+	installDir      android.OutputPath
 	installFilename string
 	outputApex      android.WritablePath
 }

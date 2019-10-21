@@ -826,7 +826,7 @@ func (p SourcePath) OverlayPath(ctx ModuleContext, path Path) OptionalPath {
 	return OptionalPathForPath(PathForSource(ctx, relPath))
 }
 
-// OutputPath is a Path representing an intermediates file path rooted from the build directory
+// OutputPath is a Path representing a file path rooted from the build directory
 type OutputPath struct {
 	basePath
 }
@@ -854,17 +854,6 @@ func PathForOutput(ctx PathContext, pathComponents ...string) OutputPath {
 	return OutputPath{basePath{path, ctx.Config(), ""}}
 }
 
-// pathForInstallInMakeDir is used by PathForModuleInstall when the module returns true
-// for InstallBypassMake to produce an OutputPath that installs to $OUT_DIR instead of
-// $OUT_DIR/soong.
-func pathForInstallInMakeDir(ctx PathContext, pathComponents ...string) InstallPath {
-	path, err := validatePath(pathComponents...)
-	if err != nil {
-		reportPathError(ctx, err)
-	}
-	return InstallPath{basePath{"../" + path, ctx.Config(), ""}}
-}
-
 // PathsForOutput returns Paths rooted from buildDir
 func PathsForOutput(ctx PathContext, paths []string) WritablePaths {
 	ret := make(WritablePaths, len(paths))
@@ -878,6 +867,10 @@ func (p OutputPath) writablePath() {}
 
 func (p OutputPath) String() string {
 	return filepath.Join(p.config.buildDir, p.path)
+}
+
+func (p OutputPath) RelPathString() string {
+	return p.path
 }
 
 // Join creates a new OutputPath with paths... joined with the current path. The
@@ -1142,39 +1135,9 @@ func PathForModuleRes(ctx ModuleContext, pathComponents ...string) ModuleResPath
 	return ModuleResPath{PathForModuleOut(ctx, "res", p)}
 }
 
-// InstallPath is a Path representing a installed file path rooted from the build directory
-type InstallPath struct {
-	basePath
-}
-
-func (p InstallPath) writablePath() {}
-
-func (p InstallPath) String() string {
-	return filepath.Join(p.config.buildDir, p.path)
-}
-
-// Join creates a new InstallPath with paths... joined with the current path. The
-// provided paths... may not use '..' to escape from the current path.
-func (p InstallPath) Join(ctx PathContext, paths ...string) InstallPath {
-	path, err := validatePath(paths...)
-	if err != nil {
-		reportPathError(ctx, err)
-	}
-	return p.withRel(path)
-}
-
-func (p InstallPath) withRel(rel string) InstallPath {
-	p.basePath = p.basePath.withRel(rel)
-	return p
-}
-
-func (p InstallPath) RelPathString() string {
-	return p.path
-}
-
 // PathForModuleInstall returns a Path representing the install path for the
 // module appended with paths...
-func PathForModuleInstall(ctx ModuleInstallPathContext, pathComponents ...string) InstallPath {
+func PathForModuleInstall(ctx ModuleInstallPathContext, pathComponents ...string) OutputPath {
 	var outPaths []string
 	if ctx.Device() {
 		partition := modulePartition(ctx)
@@ -1195,28 +1158,9 @@ func PathForModuleInstall(ctx ModuleInstallPathContext, pathComponents ...string
 	}
 	outPaths = append(outPaths, pathComponents...)
 	return PathForOutput(ctx, outPaths...)
-
-	if ctx.InstallBypassMake() && ctx.Config().EmbeddedInMake() {
-		return pathForInstallInMakeDir(ctx, outPaths...)
-	}
-
-	path, err := validatePath(outPaths...)
-	if err != nil {
-		reportPathError(ctx, err)
-	}
-	return InstallPath{basePath{path, ctx.Config(), ""}}
 }
 
-func PathForNdkInstall(ctx PathContext, paths ...string) InstallPath {
-	paths = append([]string{"ndk"}, paths...)
-	path, err := validatePath(paths...)
-	if err != nil {
-		reportPathError(ctx, err)
-	}
-	return InstallPath{basePath{path, ctx.Config(), ""}}
-}
-
-func InstallPathToOnDevicePath(ctx PathContext, path InstallPath) string {
+func InstallPathToOnDevicePath(ctx PathContext, path OutputPath) string {
 	rel := Rel(ctx, PathForOutput(ctx, "target", "product", ctx.Config().DeviceName()).String(), path.String())
 
 	return "/" + rel

@@ -75,7 +75,7 @@ func (x *hooks) runArchHooks(ctx ArchHookContext, m *ModuleBase) {
 
 type InstallHookContext interface {
 	ModuleContext
-	Path() InstallPath
+	Path() OutputPath
 	Symlink() bool
 }
 
@@ -89,11 +89,11 @@ func AddInstallHook(m blueprint.Module, hook func(InstallHookContext)) {
 
 type installHookContext struct {
 	ModuleContext
-	path    InstallPath
+	path    OutputPath
 	symlink bool
 }
 
-func (x *installHookContext) Path() InstallPath {
+func (x *installHookContext) Path() OutputPath {
 	return x.path
 }
 
@@ -101,7 +101,7 @@ func (x *installHookContext) Symlink() bool {
 	return x.symlink
 }
 
-func (x *hooks) runInstallHooks(ctx ModuleContext, path InstallPath, symlink bool) {
+func (x *hooks) runInstallHooks(ctx ModuleContext, path OutputPath, symlink bool) {
 	if len(x.install) > 0 {
 		mctx := &installHookContext{
 			ModuleContext: ctx,

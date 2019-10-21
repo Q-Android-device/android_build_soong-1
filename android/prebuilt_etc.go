@@ -62,10 +62,6 @@ type PrebuiltEtc struct {
 	// The base install location, e.g. "etc" for prebuilt_etc, "usr/share" for prebuilt_usr_share.
 	installDirBase         string
 	installDirPath         OutputPath
-	installDirBase string
-	// The base install location when soc_specific property is set to true, e.g. "firmware" for prebuilt_firmware.
-	socInstallDirBase      string
-	installDirPath         InstallPath
 	additionalDependencies *Paths
 }
 
@@ -89,10 +85,6 @@ func (p *PrebuiltEtc) DepsMutator(ctx BottomUpMutatorContext) {
 
 func (p *PrebuiltEtc) SourceFilePath(ctx ModuleContext) Path {
 	return PathForModuleSrc(ctx, String(p.properties.Src))
-}
-
-func (p *PrebuiltEtc) InstallDirPath() InstallPath {
-	return p.installDirPath
 }
 
 // This allows other derivative modules (e.g. prebuilt_etc_xml) to perform

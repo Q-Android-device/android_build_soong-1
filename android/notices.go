@@ -53,8 +53,8 @@ func MergeNotices(ctx ModuleContext, mergedNotice WritablePath, noticePaths []Pa
 	})
 }
 
-func BuildNoticeOutput(ctx ModuleContext, installPath InstallPath, installFilename string,
-	noticePaths []Path) NoticeOutputs {
+func BuildNoticeOutput(ctx ModuleContext, installPath OutputPath, installFilename string,
+	noticePaths []Path) ModuleOutPath {
 	// Merge all NOTICE files into one.
 	// TODO(jungjw): We should just produce a well-formatted NOTICE.html file in a single pass.
 	//

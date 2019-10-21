@@ -48,7 +48,7 @@ func init() {
 }
 
 // Returns the NDK base include path for use with sdk_version current. Usable with -I.
-func getCurrentIncludePath(ctx android.ModuleContext) android.InstallPath {
+func getCurrentIncludePath(ctx android.ModuleContext) android.OutputPath {
 	return getNdkSysrootBase(ctx).Join(ctx, "usr/include")
 }
 
@@ -94,7 +94,7 @@ type headerModule struct {
 }
 
 func getHeaderInstallDir(ctx android.ModuleContext, header android.Path, from string,
-	to string) android.InstallPath {
+	to string) android.OutputPath {
 	// Output path is the sysroot base + "usr/include" + to directory + directory component
 	// of the file without the leading from directory stripped.
 	//
